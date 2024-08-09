@@ -74,42 +74,42 @@ def init_model_with_function_calls():
     return model
 
 
-# Chat Interaction
-def chat_with_gemini():
-    model = init_model_with_function_calls()
-    chat = model.start_chat(history=[], enable_automatic_function_calling=True)
-    while True:
-        user_input = input("Describe a street (or type 'exit' to quit): ")
-        if user_input.lower() == "exit":
-            break
+model = init_model_with_function_calls()
+chat = model.start_chat(history=[], enable_automatic_function_calling=True)
 
-        response = chat.send_message(user_input)
-        fc = response.candidates[0].content.parts[0].function_call
-        text = response.candidates[0].content.parts[0].text
-        fc_resp = json.dumps(type(fc).to_dict(fc), indent=4)
-        if text is not None:
-            print(text)
-        if fc.name == "get_street":
-            streetmix_json = json.dumps(json.loads(fc.parameters), indent=4)
-            print("Streetmix JSON:", streetmix_json)
-            try:
+
+# Chat Interaction
+def chat_with_gemini(user_input):
+    response = chat.send_message(user_input)
+
+    # Extract function call and text from response
+    fc = response.candidates[0].content.parts[0].function_call
+    text = response.candidates[0].content.parts[0].text
+
+    result = {}
+    if text:
+        result["text"] = text 
+
+    if fc and fc.name == "get_street":
+        try:
+            streetmix_json = json.loads(fc.parameters)
+
+            # Validation and correction loop
+            for attempt in range(3):
                 validation_result = validate_streetmix_json(streetmix_json, streetmix_schema)
                 if validation_result is True:
-                    print("Streetmix JSON:", json.dumps(streetmix_json, indent=4))
+                    result["streetmix_json"] = streetmix_json
+                    break
                 else:
-                    max_attempts = 2
-                    for attempt in range(max_attempts):
-                        print(f"Validation error (attempt {attempt + 1}):", validation_result)
-                        correction_request = f"Previous response does not correspond to the Streetmix schema. Please correct the following errors and provide a new JSON:\n{validation_result}"
-                        correction_response = chat.send_message(correction_request)
-                        fc = correction_response.candidates[0].content.parts[0].function_call
-                        if fc.name == "get_street":
-                            streetmix_json = json.dumps(json.loads(fc.parameters), indent=4)
-                            validation_result = validate_streetmix_json(streetmix_json, streetmix_schema)
-                            if validation_result is True:
-                                print("Corrected Streetmix JSON:", json.dumps(streetmix_json, indent=4))
-                                break  # Выходим из цикла, если данные валидны
-                    else:
-                        print("Error: Unable to get a valid Streetmix JSON after multiple attempts. Please try to describe the street another way, with more details.")
-            except json.JSONDecodeError:
-                print("Error: Unable to decode JSON.")
+                    print(f"Validation error (attempt {attempt + 1}):", validation_result)
+                    correction_request = f"The previous response does not conform to the Streetmix schema. Please correct the following errors and provide a new JSON:\n{validation_result}"
+                    correction_response = chat.send_message(correction_request)
+                    fc = correction_response.candidates[0].content.parts[0].function_call
+                    streetmix_json = json.loads(fc.parameters)
+            else:
+                result["error"] = "Unable to get a valid Streetmix JSON after multiple attempts. Please try to describe the street another way, with more details."
+
+        except json.JSONDecodeError:
+            result["error"] = "Unable to decode JSON."
+
+    return result 
