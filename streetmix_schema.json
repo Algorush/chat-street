@@ -1,0 +1,68 @@
+{
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "name of created street. If not provided, it will be 'default street'"
+        },
+        "data": {
+            "type": "object",
+            "properties": {
+                "rightBuildingVariant": {
+                    "type": "string",
+                    "format": "enum",
+                    "description": "building variant to create for the right side of the street. Only one of enum values can be specified. Default is grass",
+                    "enum": ["grass","narrow","residental","fence","parking-lot","waterfront","wide"]
+                },
+                "leftBuildingVariant": {
+                    "type": "string",
+                    "format": "enum",
+                    "description": "building variant to create for the left side of the street. Only one of enum values can be specified. Default is wide",
+                    "enum": ["grass", "narrow", "residental", "fence", "parking-lot", "waterfront", "wide"]
+                },
+                "street": {
+                    "type": "object",
+                    "properties": {
+                        "width": {
+                            "type": "number",
+                            "description": "street length in meters. Default is 50"
+                        },
+                        "segments": {
+                            "type": "array",
+                            "description": "list of segments of a cross-section perspective of the 3D scene, each with a width in imperial feet units, a type in string format, and a variantString that applies modifications to the segment type",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "width": {
+                                        "type": "number",
+                                        "description": "segment width in imperial feet units. Default is 9"
+                                    },
+                                    "variantString": {
+                                        "type": "string",
+                                        "description": "Variant of segment. It's depend upon which segment type is selected. variantString values are separated by a pipe character (literally '|'). Most drive lane segments have an 'inbound' or 'outbound' value as the first variant."
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "format": "enum",
+                                        "description": "street segment type",
+                                        "enum": ["sidewalk","streetcar","bus-lane","drive-lane","light-rail","streetcar","turn-lane","divider","temporary","stencils","food-truck","flex-zone","sidewalk-wayfinding","sidewalk-bench","sidewalk-bike-rack","magic-carpet","outdoor-dining","parklet","bikeshare","utilities","sidewalk-tree","sidewalk-lamp","transit-shelter","parking-lane"]                                        
+                                    },
+                                    "elevation": {
+                                        "type": "string",
+                                        "format": "enum",
+                                        "description": "elevation level for segment. 1 is default for all type of sidewalks and buildings, 0 is default for roads, lanes, parking, etc",
+                                        "enum": ["0", "1", "2"]
+                                    }
+                                },
+                                "required": ["width", "variantString", "type", "elevation"]
+                        }
+                    }
+                },
+                "required": ["width", "segments"]
+            }
+        },
+        "required": ["rightBuildingVariant", "leftBuildingVariant", "street"]
+    }
+},
+"required": ["data"]
+}
