@@ -3,7 +3,7 @@
     "properties": {
         "name": {
             "type": "string",
-            "description": "name of created street. If not provided, it will be 'default street'"
+            "description": "name of created street. If not provided, generate it by description"
         },
         "data": {
             "type": "object",
@@ -12,13 +12,13 @@
                     "type": "string",
                     "format": "enum",
                     "description": "building variant to create for the right side of the street. Only one of enum values can be specified. Default is grass",
-                    "enum": ["grass","narrow","residental","fence","parking-lot","waterfront","wide"]
+                    "enum": ["grass","narrow","residential","fence","parking-lot","waterfront","wide"]
                 },
                 "leftBuildingVariant": {
                     "type": "string",
                     "format": "enum",
                     "description": "building variant to create for the left side of the street. Only one of enum values can be specified. Default is wide",
-                    "enum": ["grass", "narrow", "residental", "fence", "parking-lot", "waterfront", "wide"]
+                    "enum": ["grass", "narrow", "residential", "fence", "parking-lot", "waterfront", "wide"]
                 },
                 "street": {
                     "type": "object",
@@ -45,12 +45,12 @@
                                         "type": "string",
                                         "format": "enum",
                                         "description": "street segment type",
-                                        "enum": ["sidewalk","streetcar","bus-lane","drive-lane","light-rail","streetcar","turn-lane","divider","temporary","stencils","food-truck","flex-zone","sidewalk-wayfinding","sidewalk-bench","sidewalk-bike-rack","magic-carpet","outdoor-dining","parklet","bikeshare","utilities","sidewalk-tree","sidewalk-lamp","transit-shelter","parking-lane"]                                        
+                                        "enum": ["sidewalk", "sidewalk-wayfinding", "sidewalk-bench", "sidewalk-bike-rack", "sidewalk-tree", "utilities", "sidewalk-lamp", "parklet", "outdoor-dining", "bikeshare", "bike-lane", "scooter", "bus-lane", "drive-lane", "turn-lane", "parking-lane", "food-truck", "flex-zone", "streetcar", "light-rail", "brt-station", "transit-shelter", "divider", "temporary", "magic-carpet"]                                        
                                     },
                                     "elevation": {
                                         "type": "string",
                                         "format": "enum",
-                                        "description": "elevation level for segment. 1 is default for all type of sidewalks and buildings, 0 is default for roads, lanes, parking, etc",
+                                        "description": "elevation level for segment. 1 is default for all type of sidewalks and buildings, 0 is default for roads, lanes, parking, etc. Use information from variantString to determine the elevation level, for road is 0, for sidewalk is 1",
                                         "enum": ["0", "1", "2"]
                                     }
                                 },
@@ -58,7 +58,7 @@
                         }
                     }
                 },
-                "required": ["width", "segments"]
+                "required": ["segments"]
             }
         },
         "required": ["rightBuildingVariant", "leftBuildingVariant", "street"]

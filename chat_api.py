@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
-from func_call import chat_with_gemini  # Импортируем вашу функцию чата
+from func_call_autocorrect import chat_with_gemini
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/new-street', methods=['POST'])
 def new_street():
@@ -12,6 +14,7 @@ def new_street():
     try:
         # send the request to the chatbot and get the response in json format - streetmix_json, text or error
         result = chat_with_gemini(data['description']) 
+        print("result: ", result)
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
